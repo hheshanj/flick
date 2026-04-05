@@ -8,3 +8,7 @@ uploads/
 *.db-journal
 prisma/migrations/
 .DS_Store
+features.md 
+plan.md
+PROMPT.md
+HOSTING.md
