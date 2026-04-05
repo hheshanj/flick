@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import clsx from "clsx";
+import QRCode from "react-qr-code";
 
 const MAX_FILE_SIZE = 1073741824;
 const DURATION_OPTIONS = [5, 10, 15, 30, 60, 90, 120];
@@ -30,8 +31,9 @@ function formatExpiry(date: Date): string {
 }
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const [duration, setDuration] = useState(15);
+  const [files, setFiles] = useState<File[]>([]);
+  const [duration, setDuration] = useState<number | "custom">(15);
+  const [customMinutes, setCustomMinutes] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -48,26 +50,30 @@ export default function Home() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [maxDownloads, setMaxDownloads] = useState(0);
+  const [uniqueIpLimit, setUniqueIpLimit] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const xhrRef = useRef<XMLHttpRequest | null>(null);
 
-  const validateFile = (file: File): string | null => {
-    if (file.size > MAX_FILE_SIZE) {
-      return "File is too large. Maximum size is 1GB.";
+  const validateFiles = (incomingFiles: File[]): string | null => {
+    const totalSize = incomingFiles.reduce((acc, f) => acc + f.size, 0);
+    if (totalSize > MAX_FILE_SIZE) {
+      return "Total files size is too large. Maximum size is 1GB.";
     }
     return null;
   };
 
-  const handleFile = useCallback((selectedFile: File) => {
-    const validationError = validateFile(selectedFile);
+  const handleFiles = useCallback((selectedFiles: FileList | File[]) => {
+    const newFiles = Array.from(selectedFiles);
+    const combinedFiles = [...files, ...newFiles];
+    
+    const validationError = validateFiles(combinedFiles);
     if (validationError) {
       setError(validationError);
-      setFile(null);
       return;
     }
     setError(null);
-    setFile(selectedFile);
-  }, []);
+    setFiles(combinedFiles);
+  }, [files]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -83,22 +89,21 @@ export default function Home() {
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragging(false);
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile) {
-        handleFile(droppedFile);
+      if (e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
       }
     },
-    [handleFile]
+    [handleFiles]
   );
 
   const handleFileSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const selectedFile = e.target.files?.[0];
-      if (selectedFile) {
-        handleFile(selectedFile);
+      if (e.target.files && e.target.files.length > 0) {
+        handleFiles(e.target.files);
       }
+      e.target.value = ""; // allow re-selecting same file
     },
-    [handleFile]
+    [handleFiles]
   );
 
   const handleCancelUpload = () => {
@@ -111,7 +116,22 @@ export default function Home() {
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
+
+    let computedDuration = 15;
+    if (duration === "custom") {
+      if (!customMinutes) {
+        setError("Please specify custom minutes.");
+        return;
+      }
+      computedDuration = parseInt(customMinutes, 10);
+      if (isNaN(computedDuration) || computedDuration <= 0) {
+        setError("Custom minutes must be a positive number.");
+        return;
+      }
+    } else {
+      computedDuration = duration;
+    }
 
     setUploading(true);
     setProgress(0);
@@ -119,14 +139,15 @@ export default function Home() {
 
     return new Promise<void>((resolve, reject) => {
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("duration", duration.toString());
+      files.forEach((f) => formData.append("file", f));
+      formData.append("duration", computedDuration.toString());
       if (password) {
         formData.append("password", password);
       }
       if (maxDownloads > 0) {
         formData.append("maxDownloads", maxDownloads.toString());
       }
+      formData.append("uniqueIpLimit", uniqueIpLimit.toString());
 
       const xhr = new XMLHttpRequest();
       xhrRef.current = xhr;
@@ -148,13 +169,13 @@ export default function Home() {
             const data = JSON.parse(xhr.responseText);
             setShareUrl(data.shareUrl);
             setUploadedInfo({
-              fileName: file.name,
-              fileSize: file.size,
+              fileName: files.length > 1 ? "flick-bundle.zip" : files[0].name,
+              fileSize: files.reduce((acc, f) => acc + f.size, 0),
               expiresAt: new Date(data.expiresAt),
               hasPassword: data.hasPassword,
               maxDownloads: data.maxDownloads,
             });
-            setFile(null);
+            setFiles([]);
             setPassword("");
             setMaxDownloads(0);
             resolve();
@@ -203,12 +224,15 @@ export default function Home() {
   };
 
   const resetUpload = () => {
-    setFile(null);
+    setFiles([]);
     setShareUrl(null);
     setUploadedInfo(null);
     setError(null);
     setPassword("");
+    setDuration(15);
+    setCustomMinutes("");
     setMaxDownloads(0);
+    setUniqueIpLimit(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -256,10 +280,15 @@ export default function Home() {
               </div>
             )}
             
-            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-5 mb-8 border border-white/5 relative overflow-hidden">
+            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 mb-8 border border-white/5 relative overflow-hidden flex flex-col items-center">
               <div className="absolute top-0 left-0 w-1/2 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
+              
+              <div className="bg-white p-3 rounded-2xl mb-5 shadow-xl">
+                <QRCode value={shareUrl} size={150} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />
+              </div>
+
               <p className="text-xs text-indigo-300 mb-2 uppercase tracking-wider font-semibold">Self-Destructing Link</p>
-              <p className="font-mono text-sm break-all text-white">{shareUrl}</p>
+              <p className="font-mono text-sm break-all text-white w-full">{shareUrl}</p>
             </div>
             
             <div className="flex flex-col gap-4">
@@ -307,42 +336,61 @@ export default function Home() {
               isDragging
                 ? "border-pink-500 bg-pink-500/10 shadow-[0_0_30px_rgba(236,72,153,0.2)]"
                 : "border-gray-600/50 hover:border-indigo-500/50 hover:bg-indigo-500/5",
-              file ? "border-emerald-500/50 bg-emerald-500/5" : ""
+              files.length > 0 ? "border-emerald-500/50 bg-emerald-500/5" : ""
             )}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            onClick={() => !file && !uploading && fileInputRef.current?.click()}
+            onClick={() => files.length === 0 && !uploading && fileInputRef.current?.click()}
           >
             <input
               ref={fileInputRef}
               type="file"
               id="file-input"
               className="hidden"
+              multiple
               onChange={handleFileSelect}
               disabled={uploading}
             />
             
-            {file ? (
+            {files.length > 0 ? (
               <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
                 <div className="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <p className="font-semibold text-white mb-1 truncate px-4 text-lg">{file.name}</p>
-                <p className="text-sm text-emerald-400 font-medium">
-                  {formatFileSize(file.size)}
-                </p>
+                
+                {files.length === 1 ? (
+                  <>
+                    <p className="font-semibold text-white mb-1 truncate px-4 text-lg">{files[0].name}</p>
+                    <p className="text-sm text-emerald-400 font-medium">
+                      {formatFileSize(files[0].size)}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-white mb-1 px-4 text-lg">{files.length} Files Bundled</p>
+                    <p className="text-sm text-emerald-400 font-medium whitespace-nowrap mb-3 flex flex-col items-center gap-1">
+                      <span>Total: {formatFileSize(files.reduce((a, b) => a + b.size, 0))}</span>
+                    </p>
+                    <div className="max-h-24 overflow-y-auto w-full px-4 scrollbar-thin scrollbar-thumb-indigo-500/50 scrollbar-track-transparent">
+                      {files.map((f, i) => (
+                        <div key={i} className="text-xs text-slate-300 truncate text-center">{f.name}</div>
+                      ))}
+                    </div>
+                  </>
+                )}
+
                 {!uploading && (
                   <button
-                    onClick={() => {
-                      setFile(null);
-                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFiles([]);
                     }}
                     className="mt-5 text-sm text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 py-2 px-6 rounded-full transition font-medium border border-pink-500/20"
                   >
-                    Discard File
+                    Clear Files
                   </button>
                 )}
               </div>
@@ -370,20 +418,20 @@ export default function Home() {
             </div>
           )}
 
-          {file && (
+          {files.length > 0 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="mb-8">
                 <label className="block text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wider">
                   Self-Destruct Timer
                 </label>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="flex flex-wrap gap-3 mb-3">
                   {DURATION_OPTIONS.map((mins) => (
                     <button
                       key={mins}
                       type="button"
                       onClick={() => setDuration(mins)}
                       className={clsx(
-                        "py-3 px-2 rounded-xl text-sm font-bold transition-all duration-200 border",
+                        "py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border",
                         duration === mins
                           ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.4)]"
                           : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:border-white/20"
@@ -392,7 +440,33 @@ export default function Home() {
                       {mins}m
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => setDuration("custom")}
+                    className={clsx(
+                      "py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border",
+                      duration === "custom"
+                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                        : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:border-white/20"
+                    )}
+                  >
+                    Custom...
+                  </button>
                 </div>
+                
+                {duration === "custom" && (
+                   <div className="animate-in fade-in slide-in-from-top-2">
+                     <input
+                       type="number"
+                       value={customMinutes}
+                       onChange={(e) => setCustomMinutes(e.target.value)}
+                       min="1"
+                       placeholder="Enter minutes (e.g. 120)"
+                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+                       aria-label="Custom expiration minutes"
+                     />
+                   </div>
+                )}
               </div>
 
               <div className="mb-6">
@@ -424,6 +498,26 @@ export default function Home() {
                     )}
                   </button>
                 </div>
+              </div>
+
+              <div className="mb-6">
+                <label className="flex items-center space-x-3 cursor-pointer group bg-black/20 p-4 rounded-xl border border-white/5 hover:border-indigo-500/30 transition-all">
+                  <div className="relative flex items-center justify-center">
+                    <input 
+                      type="checkbox" 
+                      className="peer appearance-none w-6 h-6 border-2 border-indigo-500/50 rounded bg-transparent checked:bg-indigo-500 checked:border-indigo-500 transition-all cursor-pointer shadow-inner" 
+                      checked={uniqueIpLimit} 
+                      onChange={(e) => setUniqueIpLimit(e.target.checked)}
+                    />
+                    <svg className="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-gray-200 group-hover:text-indigo-300 transition-colors uppercase tracking-wider">Strict Security Mode</span>
+                    <span className="text-xs text-gray-500 font-medium">Limit to 1 download per unique IP Address.</span>
+                  </div>
+                </label>
               </div>
 
               <div className="mb-8">
@@ -466,7 +560,7 @@ export default function Home() {
 
               <button
                 onClick={uploading ? handleCancelUpload : handleUpload}
-                disabled={!file || (!uploading && (file.size > MAX_FILE_SIZE))}
+                disabled={files.length === 0 || (!uploading && (files.reduce((a,b)=>a+b.size,0) > MAX_FILE_SIZE))}
                 className={clsx(
                   "w-full py-4 px-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:shadow-[0_0_30px_rgba(236,72,153,0.5)] border border-white/10 group relative overflow-hidden",
                   uploading

@@ -43,6 +43,32 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       );
     }
 
+    const ip = req.ip || req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+
+    // @ts-ignore - type definitions might be stale until prisma db push completes
+    if (share.uniqueIpLimit) {
+      // @ts-ignore
+      let ipList: string[] = [];
+      try {
+        // @ts-ignore
+        ipList = JSON.parse(share.downloadedIps || "[]");
+      } catch (e) {}
+
+      if (ipList.includes(ip)) {
+        return NextResponse.json(
+          { error: "Download blocked: Strict Security Mode limits you to 1 download per IP address." },
+          { status: 403 }
+        );
+      }
+      
+      ipList.push(ip);
+      await prisma.share.update({
+        where: { id: share.id },
+        // @ts-ignore
+        data: { downloadedIps: JSON.stringify(ipList) },
+      });
+    }
+
     if (share.password) {
       if (!password) {
         return NextResponse.json(
@@ -68,6 +94,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Only increment basic limits if there is one, unique IP increments handled above.
     await prisma.share.update({
       where: { id: share.id },
       data: { downloadCount: { increment: 1 } },

@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
     const durationStr = formData.get("duration") as string | null;
     const password = formData.get("password") as string | null;
     const maxDownloadsStr = formData.get("maxDownloads") as string | null;
+    const uniqueIpLimitStr = formData.get("uniqueIpLimit") as string | null;
 
     if (!files || files.length === 0) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -124,6 +125,7 @@ export async function POST(req: NextRequest) {
         expiresAt,
         password: password ? hashPassword(password) : null,
         maxDownloads: maxDownloads || 0,
+        uniqueIpLimit: uniqueIpLimitStr === "true",
       },
     });
 
@@ -135,6 +137,7 @@ export async function POST(req: NextRequest) {
       shareUrl,
       hasPassword: !!password,
       maxDownloads: share.maxDownloads || null,
+      uniqueIpLimit: share.uniqueIpLimit,
     });
   } catch (error) {
     console.error("Upload error:", error);
