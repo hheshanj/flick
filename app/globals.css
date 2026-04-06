@@ -3,19 +3,28 @@
 @tailwind utilities;
 
 :root {
+  --foreground-rgb: 15, 15, 20;
+  --background-start-rgb: 250, 250, 252;
+  --background-end-rgb: 245, 245, 250;
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-glow: rgba(75, 77, 255, 0.2); 
+}
+
+.dark {
   --foreground-rgb: 255, 255, 255;
   --background-start-rgb: 10, 10, 15;
   --background-end-rgb: 0, 0, 0;
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-glow: rgba(79, 70, 229, 0.2); 
+  --glass-glow: rgba(75, 77, 255, 0.2); 
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: 
-    radial-gradient(circle at top right, rgba(79, 70, 229, 0.15), transparent 40%),
-    radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.1), transparent 40%),
+    radial-gradient(circle at top right, rgba(75, 77, 255, 0.15), transparent 40%),
+    radial-gradient(circle at bottom left, rgba(255, 132, 5, 0.1), transparent 40%),
     linear-gradient(to bottom, rgb(var(--background-start-rgb)), rgb(var(--background-end-rgb)));
   background-attachment: fixed;
   font-family: 'Inter', sans-serif;
@@ -31,15 +40,22 @@ body {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1), inset 0 0 0 1px var(--glass-border);
+  }
+  .dark .glass {
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 1px var(--glass-border);
   }
   .glass-hover:hover {
+    background: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+  }
+  .dark .glass-hover:hover {
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.2);
   }
   .gradient-text {
     background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
-    background: linear-gradient(to right, #6366f1, #ec4899);
+    background: linear-gradient(to right, #4b4dff, #ff8405);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

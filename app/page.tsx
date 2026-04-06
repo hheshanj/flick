@@ -250,16 +250,16 @@ export default function Home() {
     return (
       <main className="min-h-screen flex items-center justify-center p-4">
         <div className="glass rounded-3xl p-8 max-w-md w-full text-center relative overflow-hidden group">
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-pink-500/10 opacity-50 z-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-orange-500/10 opacity-50 z-0"></div>
           <div className="relative z-10">
             <div className="w-20 h-20 bg-gradient-to-tr from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/30">
-              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-10 h-10 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold mb-3 tracking-tight text-white">File Accelerated!</h1>
-            <p className="text-gray-300 mb-8 font-medium">
-              Vanishing gracefully on <br/> <span className="text-pink-400 font-semibold">{formatExpiry(uploadedInfo!.expiresAt)}</span>
+            <h1 className="text-3xl font-bold mb-3 tracking-tight text-gray-900 dark:text-white">File Accelerated!</h1>
+            <p className="text-gray-700 dark:text-gray-300 mb-8 font-medium">
+              Vanishing gracefully on <br/> <span className="text-orange-400 font-semibold">{formatExpiry(uploadedInfo!.expiresAt)}</span>
             </p>
             
             {uploadedInfo!.hasPassword && (
@@ -276,19 +276,19 @@ export default function Home() {
                 <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                <span className="text-indigo-300 text-sm font-medium">Max {uploadedInfo!.maxDownloads} download{uploadedInfo!.maxDownloads === 1 ? "" : "s"}</span>
+                <span className="text-indigo-600 dark:text-indigo-300 text-sm font-medium">Max {uploadedInfo!.maxDownloads} download{uploadedInfo!.maxDownloads === 1 ? "" : "s"}</span>
               </div>
             )}
             
-            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-6 mb-8 border border-white/5 relative overflow-hidden flex flex-col items-center">
+            <div className="bg-white/70 dark:bg-black/40 backdrop-blur-md rounded-2xl p-6 mb-8 border border-black/5 dark:border-white/5 relative overflow-hidden flex flex-col items-center">
               <div className="absolute top-0 left-0 w-1/2 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
               
               <div className="bg-white p-3 rounded-2xl mb-5 shadow-xl">
                 <QRCode value={shareUrl} size={150} style={{ height: "auto", maxWidth: "100%", width: "100%" }} />
               </div>
 
-              <p className="text-xs text-indigo-300 mb-2 uppercase tracking-wider font-semibold">Self-Destructing Link</p>
-              <p className="font-mono text-sm break-all text-white w-full">{shareUrl}</p>
+              <p className="text-xs text-indigo-600 dark:text-indigo-300 mb-2 uppercase tracking-wider font-semibold">Self-Destructing Link</p>
+              <p className="font-mono text-sm break-all text-gray-900 dark:text-white w-full">{shareUrl}</p>
             </div>
             
             <div className="flex flex-col gap-4">
@@ -296,14 +296,14 @@ export default function Home() {
                 onClick={copyToClipboard}
                 className={clsx(
                   "w-full py-4 px-6 rounded-xl font-bold transition-all duration-300 transform hover:-translate-y-1 shadow-[0_0_20px_rgba(99,102,241,0.3)] hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] border border-indigo-500/50",
-                  copied ? "bg-emerald-500 text-white border-emerald-400" : "bg-indigo-600 text-white hover:bg-indigo-500"
+                  copied ? "bg-emerald-500 text-gray-900 dark:text-white border-emerald-400" : "bg-indigo-600 text-gray-900 dark:text-white hover:bg-indigo-500"
                 )}
               >
                 {copied ? "Link Copied!" : "Copy Secret Link"}
               </button>
               <button
                 onClick={resetUpload}
-                className="w-full bg-white/5 text-gray-300 py-4 px-6 rounded-xl font-medium hover:bg-white/10 transition border border-transparent hover:border-white/10"
+                className="w-full bg-black/5 dark:bg-white/5 text-gray-700 dark:text-gray-300 py-4 px-6 rounded-xl font-medium hover:bg-black/10 dark:hover:bg-white/10 transition border border-transparent hover:border-black/10 dark:border-white/10"
               >
                 Share Another File
               </button>
@@ -319,12 +319,15 @@ export default function Home() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       
       <div className="w-full max-w-xl relative z-10">
-        <div className="text-center mb-10">
-          <div className="inline-block px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 mb-6 text-sm font-medium text-indigo-300">
+        <div className="text-center mb-10 flex flex-col items-center">
+          <div className="inline-block px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 mb-6 text-sm font-medium text-indigo-600 dark:text-indigo-300">
             Ephemeral • Secure • Instant
           </div>
-          <h1 className="text-6xl font-extrabold mb-4 tracking-tighter sm:text-7xl gradient-text drop-shadow-sm">Flick</h1>
-          <p className="text-lg text-gray-400 font-medium">
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <img src="/logo.svg" alt="Flick Logo" className="w-16 h-16 sm:w-20 sm:h-20 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]" />
+            <h1 className="text-6xl font-extrabold tracking-tighter sm:text-7xl gradient-text drop-shadow-sm">Flick</h1>
+          </div>
+          <p className="text-lg text-gray-600 dark:text-gray-400 font-medium">
             An encrypted, auto-destructing temp file share web app.
           </p>
         </div>
@@ -334,8 +337,8 @@ export default function Home() {
             className={clsx(
               "border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 mb-8 relative overflow-hidden group cursor-pointer",
               isDragging
-                ? "border-pink-500 bg-pink-500/10 shadow-[0_0_30px_rgba(236,72,153,0.2)]"
-                : "border-gray-600/50 hover:border-indigo-500/50 hover:bg-indigo-500/5",
+                ? "border-orange-500 bg-orange-500/10 shadow-[0_0_30px_rgba(249,115,22,0.2)]"
+                : "border-gray-300 dark:border-gray-600/50 hover:border-indigo-500/50 hover:bg-indigo-500/5",
               files.length > 0 ? "border-emerald-500/50 bg-emerald-500/5" : ""
             )}
             onDragOver={handleDragOver}
@@ -356,21 +359,21 @@ export default function Home() {
             {files.length > 0 ? (
               <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
                 <div className="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/20">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 text-gray-900 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
                 
                 {files.length === 1 ? (
                   <>
-                    <p className="font-semibold text-white mb-1 truncate px-4 text-lg">{files[0].name}</p>
+                    <p className="font-semibold text-gray-900 dark:text-white mb-1 truncate px-4 text-lg">{files[0].name}</p>
                     <p className="text-sm text-emerald-400 font-medium">
                       {formatFileSize(files[0].size)}
                     </p>
                   </>
                 ) : (
                   <>
-                    <p className="font-semibold text-white mb-1 px-4 text-lg">{files.length} Files Bundled</p>
+                    <p className="font-semibold text-gray-900 dark:text-white mb-1 px-4 text-lg">{files.length} Files Bundled</p>
                     <p className="text-sm text-emerald-400 font-medium whitespace-nowrap mb-3 flex flex-col items-center gap-1">
                       <span>Total: {formatFileSize(files.reduce((a, b) => a + b.size, 0))}</span>
                     </p>
@@ -388,7 +391,7 @@ export default function Home() {
                       e.stopPropagation();
                       setFiles([]);
                     }}
-                    className="mt-5 text-sm text-pink-400 hover:text-pink-300 bg-pink-500/10 hover:bg-pink-500/20 py-2 px-6 rounded-full transition font-medium border border-pink-500/20"
+                    className="mt-5 text-sm text-orange-400 hover:text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 py-2 px-6 rounded-full transition font-medium border border-orange-500/20"
                   >
                     Clear Files
                   </button>
@@ -396,12 +399,12 @@ export default function Home() {
               </div>
             ) : (
               <div className="relative z-10">
-                <div className="w-20 h-20 bg-gray-800/80 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner border border-white/5 group-hover:scale-110 transition-transform duration-500">
+                <div className="w-20 h-20 bg-gray-100/80 dark:bg-gray-800/80 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner border border-black/5 dark:border-white/5 group-hover:scale-110 transition-transform duration-500">
                   <svg className="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                 </div>
-                <p className="text-white text-lg font-medium mb-2">
+                <p className="text-gray-900 dark:text-white text-lg font-medium mb-2">
                   Drag & Drop <span className="text-indigo-400">or Click</span>
                 </p>
                 <p className="text-sm text-gray-500 font-medium">Up to 1GB • Any Format</p>
@@ -421,7 +424,7 @@ export default function Home() {
           {files.length > 0 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="mb-8">
-                <label className="block text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wider">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
                   Self-Destruct Timer
                 </label>
                 <div className="flex flex-wrap gap-3 mb-3">
@@ -433,8 +436,8 @@ export default function Home() {
                       className={clsx(
                         "py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border",
                         duration === mins
-                          ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.4)]"
-                          : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:border-white/20"
+                          ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-gray-900 dark:text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                          : "bg-black/5 dark:bg-white/5 text-gray-600 dark:text-gray-400 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20"
                       )}
                     >
                       {mins}m
@@ -446,8 +449,8 @@ export default function Home() {
                     className={clsx(
                       "py-3 px-4 rounded-xl text-sm font-bold transition-all duration-200 border",
                       duration === "custom"
-                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.4)]"
-                        : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:border-white/20"
+                        ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-gray-900 dark:text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                        : "bg-black/5 dark:bg-white/5 text-gray-600 dark:text-gray-400 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20"
                     )}
                   >
                     Custom...
@@ -462,7 +465,7 @@ export default function Home() {
                        onChange={(e) => setCustomMinutes(e.target.value)}
                        min="1"
                        placeholder="Enter minutes (e.g. 120)"
-                       className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+                       className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
                        aria-label="Custom expiration minutes"
                      />
                    </div>
@@ -470,7 +473,7 @@ export default function Home() {
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wider">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
                   Password Protection
                 </label>
                 <div className="relative">
@@ -479,12 +482,12 @@ export default function Home() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Optional password"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 pr-12 text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
+                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 pr-12 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-300 transition"
                   >
                     {showPassword ? (
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -501,7 +504,7 @@ export default function Home() {
               </div>
 
               <div className="mb-6">
-                <label className="flex items-center space-x-3 cursor-pointer group bg-black/20 p-4 rounded-xl border border-white/5 hover:border-indigo-500/30 transition-all">
+                <label className="flex items-center space-x-3 cursor-pointer group bg-black/20 p-4 rounded-xl border border-black/5 dark:border-white/5 hover:border-indigo-500/30 transition-all">
                   <div className="relative flex items-center justify-center">
                     <input 
                       type="checkbox" 
@@ -509,19 +512,19 @@ export default function Home() {
                       checked={uniqueIpLimit} 
                       onChange={(e) => setUniqueIpLimit(e.target.checked)}
                     />
-                    <svg className="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="absolute w-4 h-4 text-gray-900 dark:text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-gray-200 group-hover:text-indigo-300 transition-colors uppercase tracking-wider">Strict Security Mode</span>
+                    <span className="text-sm font-semibold text-gray-200 group-hover:text-indigo-600 dark:text-indigo-300 transition-colors uppercase tracking-wider">Strict Security Mode</span>
                     <span className="text-xs text-gray-500 font-medium">Limit to 1 download per unique IP Address.</span>
                   </div>
                 </label>
               </div>
 
               <div className="mb-8">
-                <label className="block text-sm font-semibold text-gray-300 mb-4 uppercase tracking-wider">
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4 uppercase tracking-wider">
                   Download Limit
                 </label>
                 <div className="grid grid-cols-4 gap-3">
@@ -533,8 +536,8 @@ export default function Home() {
                       className={clsx(
                         "py-3 px-2 rounded-xl text-sm font-bold transition-all duration-200 border",
                         maxDownloads === opt.value
-                          ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.4)]"
-                          : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:border-white/20"
+                          ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-gray-900 dark:text-white border-transparent shadow-[0_0_15px_rgba(99,102,241,0.4)]"
+                          : "bg-black/5 dark:bg-white/5 text-gray-600 dark:text-gray-400 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20"
                       )}
                     >
                       {opt.label}
@@ -546,12 +549,12 @@ export default function Home() {
               {uploading && (
                 <div className="mb-6">
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-400">Uploading...</span>
+                    <span className="text-gray-600 dark:text-gray-400">Uploading...</span>
                     <span className="text-indigo-400 font-medium">{progress}%</span>
                   </div>
                   <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div
-                      className="bg-gradient-to-r from-indigo-500 to-pink-500 h-full rounded-full transition-all duration-300 ease-out"
+                      className="bg-gradient-to-r from-indigo-500 to-orange-500 h-full rounded-full transition-all duration-300 ease-out"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -562,10 +565,10 @@ export default function Home() {
                 onClick={uploading ? handleCancelUpload : handleUpload}
                 disabled={files.length === 0 || (!uploading && (files.reduce((a,b)=>a+b.size,0) > MAX_FILE_SIZE))}
                 className={clsx(
-                  "w-full py-4 px-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:shadow-[0_0_30px_rgba(236,72,153,0.5)] border border-white/10 group relative overflow-hidden",
+                  "w-full py-4 px-4 rounded-2xl font-bold text-lg transition-all duration-300 shadow-[0_0_20px_rgba(249,115,22,0.3)] hover:shadow-[0_0_30px_rgba(249,115,22,0.5)] border border-black/10 dark:border-white/10 group relative overflow-hidden",
                   uploading
                     ? "bg-red-600 hover:bg-red-500"
-                    : "bg-gradient-to-r from-indigo-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    : "bg-gradient-to-r from-indigo-600 to-orange-600 hover:from-indigo-500 hover:to-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
               >
                 {uploading ? (
